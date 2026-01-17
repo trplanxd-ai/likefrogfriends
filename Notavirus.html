@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Not a virus, I promise</title>
+    <!-- Liên kết đến file CSS riêng biệt -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- CSS nội tuyến cho các phần tử game mới -->
+    <style>
+        /* Ẩn khung game và kết quả ban đầu */
+        #gameAreaVal, #resultVal, #highScoreVal { /* Thêm highScoreVal vào đây để quản lý hiển thị */
+            display: none; 
+        }
+
+        /* Định nghĩa kích thước, màu nền cho khung game khi nó hiện ra */
+        #gameAreaVal {
+            height: 300px; 
+            background-color: #eee;
+            border: 2px solid #ccc;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Định kiểu cho các thông báo con bên trong gameAreaVal */
+        .notification {
+            position: absolute;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.3s ease-out;
+            opacity: 1;
+            z-index: 10;
+            font-size: 0.8em;
+            width: 120px; 
+            text-align: center;
+        }
+
+        .notification.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TARGET SECTIONS -->
+    <div id="val" class="content">
+        <b>Val</b>: calm, collected, and suspiciously quiet.
+        <!-- NỘI DUNG GAME MỚI ĐƯỢC THÊM VÀO ĐÂY -->
+        <hr style="margin: 10px 0;">
+        
+        <!-- Nút Bắt đầu game -->
+        <button onclick="startGameVal()"><p style="color: red">Feel my</p> <b style="color:#2eb033; font-family:monospace">ENTANGLEMENT!</b></button>
+        
+        <!-- HIỂN THỊ KỶ LỤC CÁ NHÂN -->
+        <p id="highScoreVal" style="margin-top: 10px; font-weight: bold; color: blue;"></p>
+
+        <!-- KHU VỰC CHƠI GAME (Ẩn ban đầu, chỉ hiện khi nhấn nút) -->
+        <div id="gameAreaVal"></div>
+        
+        <!-- KHU VỰC KẾT QUẢ (Ẩn ban đầu, chỉ hiện khi nhấn nút) -->
+        <p id="resultVal"></p>
+    </div>
+
+    <div id="chiek" class="content">
+        <b>Chiek</b>: energetic, chaotic… Moon không thích cho lắm.
+    </div>
+
+    <div id="jessie" class="content">
+        <b>Jessie</b>: A gambler who screamming and yapping a lot <b style="color:Purple; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; ">[Unlucky Gambler]</b>
+        <br><br>
+        <button class="luck-btn" onclick="luckTest()">Try your luck</button>
+        <p id="result-display" style="margin-top:15px; font-weight:bold;"></p>
+    </div>
+
+    <div id="mint" class="content">
+        <b>Mint</b>: Just a silly clown who <b style="color:RED; font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;">EMBRACE SILLINESS</b>
+    </div>
+
+    <!-- QUESTION -->
+    <h1 id="question1" class="write">Who are you?</h1>
+
+    <!-- BUTTONS -->
+    <div class="friends">
+        <a class="btn" href="#val">Val</a>
+        <a class="btn" href="#chiek">Chiek</a>
+        <a class="btn" href="#jessie">Jessie</a>
+        <a class="btn" href="#mint">Mint</a>
+    </div>
+
+    <!-- BACKGROUND (PHẢI ĐỂ CUỐI FILE) -->
+    <div id="bg"></div>
+    
+    <script>
+        // --- JAVASCRIPT CHO GAME CỦA VAL ---
+        const gameAreaVal = document.getElementById('gameAreaVal');
+        const resultValArea = document.getElementById('resultVal');
+        const highScoreValArea = document.getElementById('highScoreVal'); // Get record element
+        let startTimeVal;
+        let notificationsCountVal = 0;
+        const TOTAL_NOTIFICATIONS_VAL = 5;
+        const NOTIF_WIDTH = 140;
+        const NOTIF_HEIGHT = 70;
+
+        // DANH SÁCH NỘI DUNG THÔNG BÁO NGẪU NHIÊN
+        const NOTIFICATION_CONTENTS = [
+            "JESSIE",
+            "MINT",
+            "Val is watching",
+            "CHIEK",
+            "Forsaken?",
+            "wdym?",
+            "TRUD!",
+            "...",
+            "1 EGG!"
+        ];
+
+        function getRandom(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function dismissNotification(event) {
+            const notif = event.target;
+            notif.classList.add('hidden'); 
+            
+            notificationsCountVal++;
+
+            if (notificationsCountVal === TOTAL_NOTIFICATIONS_VAL) {
+                endGameVal();
+            }
+        }
+
+        function startGameVal() {
+            // SHOW GAME AREA AND RESULT AREA WHEN CLICKING THE BUTTON
+            gameAreaVal.style.display = 'block'; 
+            resultValArea.style.display = 'block';
+            highScoreValArea.style.display = 'block'; // Ensure record also shows
+            
+            gameAreaVal.innerHTML = ''; // Clear old notifications
+            resultValArea.textContent = 'Playing...';
+            notificationsCountVal = 0;
+            startTimeVal = Date.now(); // Start timer
+
+            // Create notifications using random content list
+            for (let i = 0; i < TOTAL_NOTIFICATIONS_VAL; i++) {
+                createNotificationVal(); // Call without ID
+            }
+        }
+
+        function createNotificationVal() {
+            const notif = document.createElement('div');
+            
+            // SELECT RANDOM CONTENT FROM ARRAY
+            const randomIndex = Math.floor(Math.random() * NOTIFICATION_CONTENTS.length);
+            notif.textContent = NOTIFICATION_CONTENTS[randomIndex];
+
+            notif.classList.add('notification');
+            notif.onclick = dismissNotification;
+
+            // Calculate random position without overflowing
+            const areaWidth = gameAreaVal.offsetWidth - NOTIF_WIDTH;
+            const areaHeight = gameAreaVal.offsetHeight - NOTIF_HEIGHT;
+            
+            notif.style.left = `${getRandom(0, areaWidth)}px`;
+            notif.style.top = `${getRandom(0, areaHeight)}px`;
+
+            gameAreaVal.appendChild(notif);
+        }
+
+        function endGameVal() {
+            const endTime = Date.now();
+            const timeTaken = (endTime - startTimeVal) / 1000;
+            resultValArea.innerHTML = `🎉 Escape entanglement in **${timeTaken.toFixed(2)} sec** 🎉`;
+            
+            // LOGIC TO SAVE NEW HIGH SCORE TO LOCALSTORAGE
+            const highScore = parseFloat(localStorage.getItem("val_highscore") || "999999"); 
+            
+            if (timeTaken < highScore) {
+                localStorage.setItem("val_highscore", timeTaken.toFixed(2)); 
+                alert(`🎊 Your new record! ${timeTaken.toFixed(2)} sec!`);
+            }
+            
+            updateHighScoreVal(); // Update the display of the high score after playing
+        }
+
+        // FUNCTION TO UPDATE HIGH SCORE DISPLAY
+        function updateHighScoreVal() {
+            const highScore = localStorage.getItem("val_highscore");
+            if (highScore) {
+                highScoreValArea.textContent = `Personal record: ${highScore} sec`;
+            } else {
+                highScoreValArea.textContent = `No record yet`;
+            }
+        }
+
+
+
+        // --- JAVASCRIPT GỐC CHO JESSIE (GAME XÚC XẮC) ---
+        const romanMapExtended = [ [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"], [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"] ];
+        function integerToRoman(num) { 
+            if (num < 1 || num > 3999) { return num.toString(); }
+            let result = '';
+            for (const [value, symbol] of romanMapExtended) {
+                while (num >= value) { result += symbol; num -= value; }
+            }
+            return result;
+        }
+        function luckTest() {
+            let r = Math.random() < 0.5 ? 1 : 2;
+            let win = parseInt(localStorage.getItem("jessie_win") || "0");
+            let lose = parseInt(localStorage.getItem("jessie_lose") || "0");
+            if (r === 1) {
+                win++; localStorage.setItem("jessie_win", win); alert("🎉 Heads");
+            } else {
+                lose++; localStorage.setItem("jessie_lose", lose); alert("😔 Tails");
+            }
+            updateDisplay();
+        }
+        function updateDisplay() {
+            let win = localStorage.getItem("jessie_win") || 0;
+            let lose = localStorage.getItem("jessie_lose") || 0;
+            const loseRoman = integerToRoman(lose); 
+            document.getElementById("result-display").innerText = win + " Heads — " + "Weakness " + loseRoman;
+        }
+        
+        // Gọi hàm cập nhật hiển thị khi tải trang
+        updateDisplay(); 
+        updateHighScoreVal(); // Gọi hàm cập nhật kỷ lục Val khi tải trang lần đầu
+    </script>
+
+</body>
+</html>
